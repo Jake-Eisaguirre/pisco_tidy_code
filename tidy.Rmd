@@ -13,16 +13,15 @@ library(tidyverse)
 
 # Swath
 ```{r}
-swath <- read.csv(here("Desktop", "raw_swath.csv")) %>% 
+swath <- read.csv(here("data", "swath.csv")) %>% 
   select(!c(survey_year, size, disease, notes, site_name_old)) %>% 
   unnest()
 
-
-dirt_swath <- read.csv(here("Desktop", "swath.csv"))  
   
 swath_wide <- swath %>% 
   pivot_wider(id_cols = c(campus, method, year, depth,
                           month, day, site, zone, transect, observer), names_from = classcode, values_from = count)
+
 
 clean_swath <- swath_wide %>% 
   rowwise() %>% 
@@ -48,6 +47,6 @@ for(i in 11:184){
 }
 
 
-write.csv(clean_swath, here("Desktop", "clean_swath.csv"))
+write.csv(clean_swath, here("data", "clean_swath.csv"))
 ```
 
