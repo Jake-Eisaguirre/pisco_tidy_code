@@ -1,0 +1,53 @@
+---
+title: "tidy"
+author: "Jake Eisaguirre"
+date: "3/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(tidyverse)
+```
+
+# Swath
+```{r}
+swath <- read.csv(here("Desktop", "raw_swath.csv")) %>% 
+  select(!c(survey_year, size, disease, notes, site_name_old)) %>% 
+  unnest()
+
+
+dirt_swath <- read.csv(here("Desktop", "swath.csv"))  
+  
+swath_wide <- swath %>% 
+  pivot_wider(id_cols = c(campus, method, year, depth,
+                          month, day, site, zone, transect, observer), names_from = classcode, values_from = count)
+
+clean_swath <- swath_wide %>% 
+  rowwise() %>% 
+  mutate(MACPYRAD = sum(MACPYRAD),
+         PATMIN = sum(PATMIN),
+         HENLEV = sum(HENLEV),
+         STRPURAD = sum(STRPURAD),
+         MESFRAAD = sum(MESFRAAD),
+         PISGIG = sum(PISGIG),
+         DERIMB = sum(DERIMB),
+         PISOCH = sum(PISOCH),
+         HALRUF = sum(HALRUF),
+         HALWAL = sum(HALWAL),
+         HALKAM = sum(HALKAM),
+         PISSPP = sum(PISSPP),
+         PANINT = sum(PANINT)) %>% 
+  unnest(c(11:184))
+  
+
+
+for(i in 11:184){
+  clean_swath[is.na(clean_swath[,i]), i] = 0
+}
+
+
+write.csv(clean_swath, here("Desktop", "clean_swath.csv"))
+```
+
