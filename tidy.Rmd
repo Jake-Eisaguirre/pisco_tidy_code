@@ -50,3 +50,20 @@ for(i in 11:184){
 write.csv(clean_swath, here("data", "clean_swath.csv"))
 ```
 
+# upc
+```{r}
+
+raw_upc <- read_csv(here("data", "upc.csv")) %>% 
+  select(!c(survey_year, notes, site_name_old)) %>% 
+  unnest()
+
+upc_wide <- raw_upc %>% 
+  pivot_wider(id_cols = c(campus, method, year, month, day, site, zone, transect, pct_cov),
+                       names_from = classcode, values_from = count)
+
+for(i in 10:96){
+  upc_wide[is.na(upc_wide[,i]), i] = 0
+}
+
+```
+
