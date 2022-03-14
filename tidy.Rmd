@@ -20,7 +20,8 @@ swath <- read.csv(here("data", "swath.csv")) %>%
   
 swath_wide <- swath %>% 
   pivot_wider(id_cols = c(campus, method, year, depth,
-                          month, day, site, zone, transect, observer), names_from = classcode, values_from = count)
+                          month, day, site, zone, transect, observer),
+              names_from = classcode, values_from = count)
 
 
 clean_swath <- swath_wide %>% 
@@ -38,9 +39,10 @@ clean_swath <- swath_wide %>%
          HALKAM = sum(HALKAM),
          PISSPP = sum(PISSPP),
          PANINT = sum(PANINT)) %>% 
-  unnest(c(11:184))
+  unnest(c(11:184)) %>% 
+  mutate_all(na_if, "")
   
-
+is.na(clean_swath$observer)
 
 for(i in 11:184){
   clean_swath[is.na(clean_swath[,i]), i] = 0
@@ -54,16 +56,30 @@ write.csv(clean_swath, here("data", "clean_swath.csv"))
 ```{r}
 
 raw_upc <- read_csv(here("data", "upc.csv")) %>% 
-  select(!c(survey_year, notes, site_name_old)) %>% 
+  select(!c(survey_year, notes, site_name_old, pct_cov)) %>% 
   unnest()
 
 upc_wide <- raw_upc %>% 
-  pivot_wider(id_cols = c(campus, method, year, month, day, site, zone, transect, pct_cov),
+  pivot_wider(id_cols = c(campus, method, year, month, day, site, zone, transect),
                        names_from = classcode, values_from = count)
 
-for(i in 10:96){
+for(i in 9:95){
   upc_wide[is.na(upc_wide[,i]), i] = 0
 }
+
+write.csv(upc_wide, here("data", "clean_upc.csv"))
+
+```
+
+#fish
+```{r}
+
+raw_fish <- read_csv(here("data", "fish.csv")) %>% 
+  select(!c(survey_year, notes, site_name_old, LOOKEDFOR))
+
+upc_fsih <- raw_fish %>% 
+  pivot_wider(id_cols = c(campus, method, year, month, day, site, zone, transect, pct_cov),
+                       names_from = classcode, values_from = count)
 
 ```
 
